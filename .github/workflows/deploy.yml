@@ -10,18 +10,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Databricks CLI
-        uses: databricks/setup-databricks@v3
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-
-      - name: Deploy notebooks to Databricks
+      - name: Sync Databricks Repo to main branch
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
-          databricks workspace import-dir ./movies /Repos/david.bayon.alvarez@gmail.com/databricks_repo/movies --overwrite
+          REPO_ID=$(curl -sf "${DATABRICKS_HOST}/api/2.0/repos" \
+            -H "Authorization: Bearer ${DATABRICKS_TOKEN}" | \
+            python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          repo = next(r for r in data.get('repos', []) if 'databricks_repo' in r.get('path', ''))
+          print(repo['id'])
+          ")
+          echo "Syncing repo ID: $REPO_ID"
+          curl -sf -X PATCH "${DATABRICKS_HOST}/api/2.0/repos/${REPO_ID}" \
+            -H "Authorization: Bearer ${DATABRICKS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"branch": "main"}'
+          echo "Databricks Repo synced to latest main"
