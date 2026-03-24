@@ -14,6 +14,10 @@ Principios SOLID aplicados:
 """
 
 import logging
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from pyspark.sql import DataFrame, Row
 from pyspark.sql.types import StringType, StructField, StructType
