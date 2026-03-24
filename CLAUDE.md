@@ -36,6 +36,18 @@ The `ejemplo_esquema_local.ipynb` is a standalone reference/example notebook (em
 
 All tables live in the `etl_cine` database, which is auto-created by the extraction notebooks if it doesn't exist. Tables use Delta format.
 
+## Coding Standards
+
+Every code change must follow the five SOLID principles:
+
+| Principle | Rule |
+|-----------|------|
+| **S** — Single Responsibility | Each class/function has one reason to change. Separate API calls, transformations, and persistence into distinct classes. |
+| **O** — Open/Closed | Extend behavior via subclasses (e.g. `BaseExtractor`, `BaseTransformer`); never modify existing base classes to add new features. |
+| **L** — Liskov Substitution | Subclasses must be fully substitutable for their base class without altering correctness. |
+| **I** — Interface Segregation | Keep interfaces small and focused (e.g. `IWriter` only exposes `write()`). No class should implement methods it doesn't use. |
+| **D** — Dependency Inversion | High-level modules depend on abstractions, not concretions. Inject `spark`, `writer`, and `client` as constructor parameters; never instantiate them inside business logic. |
+
 ## Key Patterns
 
 - **Secrets**: Retrieved via `dbutils.secrets.get(scope="...", key="...")`
