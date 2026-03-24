@@ -16,7 +16,12 @@ import logging
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    _dir = os.path.dirname(os.path.abspath(__file__))
+except NameError:
+    import inspect as _inspect
+    _dir = os.path.dirname(os.path.abspath(_inspect.getframeinfo(_inspect.currentframe()).filename))
+sys.path.insert(0, _dir)
 
 from pyspark.sql import DataFrame, Row
 from pyspark.sql.types import (
